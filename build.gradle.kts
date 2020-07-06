@@ -56,7 +56,9 @@ kotlin {
                 implementation(project(":mathcat-core"))
                 implementation(project(":mathcat-morphism"))
                 implementation(project(":mathcat-lens"))
+                implementation(project(":mathcat-prism"))
                 implementation(project(":mathcat-store"))
+                implementation(project(":mathcat-structure"))
             }
         }
         val commonTest by getting {
