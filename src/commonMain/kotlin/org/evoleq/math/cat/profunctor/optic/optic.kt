@@ -26,6 +26,9 @@ interface Optic<A, B, S ,T> : Morphism<Profunctor<A, B>, Profunctor<S, T>> {
     override fun getValue(thisRef: Any?, property: KProperty<*>): (Profunctor<A, B>)-> Profunctor<S, T> = { p ->morphism(p)}
 }
 
+/**
+ * Constructor function for the [Optic]
+ */
 @MathCatDsl
 @Suppress("FunctionName")
 fun <A, B, S, T> Optic(optic: (Profunctor<A, B>)->Profunctor<S, T>): Optic<A, B, S, T> = object : Optic<A, B, S, T> {
@@ -33,5 +36,8 @@ fun <A, B, S, T> Optic(optic: (Profunctor<A, B>)->Profunctor<S, T>): Optic<A, B,
         get() = optic
 }
 
+/**
+ * Compose [Optic]s
+ */
 @MathCatDsl
-fun <A, B, S, T, X, Y> Optic<S, T, X, Y>.o(other: Optic<A, B, S, T>): Optic<A, B, X, Y> = Optic ( by(this) o by(other) )
+infix fun <A, B, S, T, X, Y> Optic<S, T, X, Y>.o(other: Optic<A, B, S, T>): Optic<A, B, X, Y> = Optic ( by(this) o by(other) )

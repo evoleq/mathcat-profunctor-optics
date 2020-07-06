@@ -21,7 +21,17 @@ import org.evoleq.math.cat.profunctor.Profunctor
 
 interface CoCartesian<S, T> : Profunctor<S, T> {
     @MathCatDsl
-    fun <U> left(): Profunctor<Either<S, U>, Either<T, U>>
+    fun <U> left(): CoCartesian<Either<S, U>, Either<T, U>>
+    
     @MathCatDsl
-    fun <U> right(): Profunctor<Either<U, S>, Either<U, T>>
+    fun <U> right(): CoCartesian<Either<U, S>, Either<U, T>>
+    
+    @MathCatDsl
+    override fun <R> contraMap(f: (R) -> S): CoCartesian<R, T>
+    
+    @MathCatDsl
+    override fun <U> map(f: (T) -> U): CoCartesian<S, U>
+    
+    @MathCatDsl
+    override fun <R, U> diMap(pre: (R) -> S, post: (T) -> U): CoCartesian<R, U> = this contraMap pre map post
 }

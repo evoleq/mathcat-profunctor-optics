@@ -15,4 +15,34 @@
  */
 package org.evoleq.math.cat.profunctor.transformer
 
-interface Traversing<A, B> : Algebraic<A, B>, Monoidal<A, B>
+import org.evoleq.math.cat.adt.Either
+import org.evoleq.math.cat.marker.MathCatDsl
+
+interface Traversing<A, B> : Algebraic<A, B>, Monoidal<A, B> {
+    @MathCatDsl
+    override fun <R> contraMap(f: (R) -> A): Traversing<R, B>
+    
+    @MathCatDsl
+    override fun <U> map(f: (B) -> U): Traversing<A, U>
+    
+    @MathCatDsl
+    override fun <R, U> diMap(pre: (R) -> A, post: (B) -> U): Traversing<R, U> = this contraMap pre map post
+    
+    @MathCatDsl
+    override fun <U> first(): Traversing<Pair<A, U>, Pair<B, U>>
+    
+    @MathCatDsl
+    override fun <U> second(): Traversing<Pair<U, A>, Pair<U, B>>
+    
+    @MathCatDsl
+    override fun <U> left(): Traversing<Either<A, U>, Either<B, U>>
+    
+    @MathCatDsl
+    override fun <U> right(): Traversing<Either<U, A>, Either<U, B>>
+    
+    @MathCatDsl
+    override fun <C, D> parallel(): (Pair<Monoidal<A, B>, Monoidal<C, D>>) -> Traversing<Pair<A, C>, Pair<B, D>>
+    
+    @MathCatDsl
+    override fun empty(): Traversing<Unit, Unit>
+}

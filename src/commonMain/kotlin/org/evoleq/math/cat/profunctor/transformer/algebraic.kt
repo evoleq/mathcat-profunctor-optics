@@ -15,4 +15,22 @@
  */
 package org.evoleq.math.cat.profunctor.transformer
 
-interface Algebraic<S, T> : Cartesian<S, T>, CoCartesian<S, T>
+import org.evoleq.math.cat.marker.MathCatDsl
+
+interface Algebraic<S, T> : Cartesian<S, T>, CoCartesian<S, T> {
+    
+    @MathCatDsl
+    override fun <U> first(): Algebraic<Pair<S, U>, Pair<T, U>>
+    
+    @MathCatDsl
+    override fun <U> second(): Algebraic<Pair<U, S>, Pair<U, T>>
+    
+    @MathCatDsl
+    override fun <R, U> diMap(pre: (R) -> S, post: (T) -> U):Algebraic<R, U>
+    
+    @MathCatDsl
+    override fun <U> map(f: (T) -> U): Algebraic<S, U>
+    
+    @MathCatDsl
+    override fun <R> contraMap(f: (R) -> S): Algebraic<R, T>
+}
