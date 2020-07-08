@@ -1,8 +1,7 @@
-package org.evoleq.math.cat.transformer
+package org.evoleq.math.cat.profunctor.transformer
 
-import org.evoleq.math.cat.lens.ILens
 import org.evoleq.math.cat.morphism.by
-import org.evoleq.math.cat.profunctor.transformer.Cartesian
+import org.evoleq.math.cat.optic.lens.ILens
 import kotlin.test.Test
 
 class CartesianTest {
@@ -14,12 +13,12 @@ class CartesianTest {
     
             override fun <R> contraMap(f: (R) -> S): Cartesian<R, T> = Cartesian(ILens<R, T, A, B> { r -> by(lens)(f(r)) })
     
-            override fun <U> first(): Cartesian<Pair<S, U>, Pair<T, U>> = Cartesian(ILens<Pair<S, U>, Pair<T, U>, A, B> {
-                pair -> by(lens)(pair.first).map{t -> Pair(t, pair.second)}
+            override fun <U> first(): Cartesian<Pair<S, U>, Pair<T, U>> = Cartesian(ILens<Pair<S, U>, Pair<T, U>, A, B> { pair ->
+                by(lens)(pair.first).map { t -> Pair(t, pair.second) }
             })
     
-            override fun <U> second(): Cartesian<Pair<U, S>, Pair<U, T>> = Cartesian(ILens<Pair<U, S>, Pair<U, T>, A, B>{
-                pair -> by(lens)(pair.second).map{t -> Pair(pair.first, t)}
+            override fun <U> second(): Cartesian<Pair<U, S>, Pair<U, T>> = Cartesian(ILens<Pair<U, S>, Pair<U, T>, A, B> { pair ->
+                by(lens)(pair.second).map { t -> Pair(pair.first, t) }
             })
         }
     
