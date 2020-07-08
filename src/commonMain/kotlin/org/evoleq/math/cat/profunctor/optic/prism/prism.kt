@@ -21,6 +21,7 @@ import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.morphism.by
 import org.evoleq.math.cat.morphism.id
 import org.evoleq.math.cat.profunctor.Profunctor
+import org.evoleq.math.cat.profunctor.light.AlgebraicLight
 import org.evoleq.math.cat.profunctor.light.CoCartesianLight
 import org.evoleq.math.cat.profunctor.optic.Optic
 import org.evoleq.math.cat.profunctor.optic.alias.ConcretePrism
@@ -37,6 +38,11 @@ data class Prism<A, B, S,  T>(
 fun <A, B, S, T, U, V> Optic< S, T, U, V>.propagate(
     light: CoCartesianLight<A, B, S, T>
 ): CoCartesianLight<A, B, U, V> = by(this)(light) as CoCartesianLight<A, B, U, V>
+
+@MathCatDsl
+fun <A, B, S, T, U, V> Prism<S, T, U, V>.propagate(
+    light: AlgebraicLight<A, B, S, T>
+): AlgebraicLight<A, B, U, V> = this.morphism(light as CoCartesianLight<A, B, S, T>) as AlgebraicLight<A, B, U, V>
 
 @MathCatDsl
 @Suppress("FunctionName")

@@ -20,6 +20,7 @@ import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.morphism.Morphism
 import org.evoleq.math.cat.morphism.id
 import org.evoleq.math.cat.morphism.o
+import org.evoleq.math.cat.profunctor.transformer.CoMonoidal
 import org.evoleq.math.cat.profunctor.transformer.Monoidal
 import org.evoleq.math.cat.profunctor.transformer.Traversing
 import org.evoleq.math.cat.structure.plus
@@ -28,12 +29,13 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 
-interface  Arrow<S, T> : Traversing<S, T>, ReadOnlyProperty<Any?,(S)->T> {
+interface  Arrow<S, T> : Traversing<S, T>, CoMonoidal<S, T>, ReadOnlyProperty<Any?,(S)->T> {
     
     val morphism: (S)->T
     
     override fun getValue(thisRef: Any?, property: KProperty<*>): (S) -> T = morphism
     
+    @MathCatDsl
     override fun <R, U> diMap(pre: (R) -> S, post: (T) -> U): Arrow<R, U> = Arrow(
         post o morphism o pre
     )
@@ -57,20 +59,34 @@ interface  Arrow<S, T> : Traversing<S, T>, ReadOnlyProperty<Any?,(S)->T> {
     override fun <C> right(): Arrow<Either<C, S>, Either<C, T>> = Arrow(id<C>() + morphism)
     
     @MathCatDsl
-    override fun <C, D> parallel(): (Pair<Monoidal<S, T>, Monoidal<C, D>>) -> Arrow<Pair<S, C>, Pair<T, D>> = {
-        pair -> require(pair.first is Arrow && pair.second is Arrow)
-                Arrow(by(pair.first as Arrow<S, T>) x by(pair.second as Arrow<C, D>))
+    override fun <C, D> parallel(monoidal: Monoidal<C, D>): Arrow<Pair<S, C>, Pair<T, D>> {
+        require(monoidal is Arrow)
+        return Arrow(by(this) x by(monoidal))
     }
+    
+    
     
     @MathCatDsl
     override fun empty(): Arrow<Unit, Unit> = Arrow(id())
+    
+    override fun <C, D> branch(comonoidal: CoMonoidal<C,D>): Arrow<Either<S, C>, Either<T, D>> {
+        require(comonoidal is Arrow<*,*>)
+        return Arrow(by(this) + by(comonoidal as Arrow<C, D>))
+    }
+    
+    override fun nothing(): Arrow<Nothing, Nothing> = Companion.nothing()
+    
+    companion object {
+        fun empty(): Arrow<Unit,Unit> = Arrow (id())
+        
+        fun nothing(): Arrow<Nothing,Nothing> = Arrow { TODO() }
+    }
 }
 
 @MathCatDsl
 @Suppress("FunctionName")
 fun <S, T> Arrow(morphism: (S)->T): Arrow<S, T> = object : Arrow<S, T> {
     override val morphism: (S) -> T = morphism
-    
 }
 
 @MathCatDsl

@@ -41,7 +41,7 @@ interface Traversing<A, B> : Algebraic<A, B>, Monoidal<A, B> {
     override fun <U> right(): Traversing<Either<U, A>, Either<U, B>>
     
     @MathCatDsl
-    override fun <C, D> parallel(): (Pair<Monoidal<A, B>, Monoidal<C, D>>) -> Traversing<Pair<A, C>, Pair<B, D>>
+    override fun <C, D> parallel(monoidal: Monoidal<C, D>): Traversing<Pair<A, C>, Pair<B, D>>
     
     @MathCatDsl
     override fun empty(): Traversing<Unit, Unit>

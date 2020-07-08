@@ -3,6 +3,7 @@ package org.evoleq.math.cat.profunctor.light
 import org.evoleq.math.cat.comonad.store.IStore
 import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.morphism.by
+import org.evoleq.math.cat.morphism.unCurry
 import org.evoleq.math.cat.optic.lens.ILens
 import org.evoleq.math.cat.profunctor.optic.alias.ConcreteLens
 import org.evoleq.math.cat.profunctor.transformer.Cartesian
@@ -18,7 +19,7 @@ interface CartesianLight<A, B, S, T> : Cartesian<S, T>, ConcreteLens<S, T, A, B>
  */
 @MathCatDsl
 @Suppress("FunctionName")
-fun <S, T, A, B> Cartesian(lens: ConcreteLens<S, T, A, B>): CartesianLight<A, B, S, T> = object : CartesianLight<A, B, S, T> {
+fun <A, B, S, T> Cartesian(lens: ConcreteLens<S, T, A, B>): CartesianLight<A, B, S, T> = object : CartesianLight<A, B, S, T> {
     
     override val morphism: (S) -> IStore<A, B, T> = by(lens)
     
@@ -38,6 +39,17 @@ fun <S, T, A, B> Cartesian(lens: ConcreteLens<S, T, A, B>): CartesianLight<A, B,
         (by(lens))(pair.second).map { t -> Pair(pair.first, t) }
     })
 }
+
+@MathCatDsl
+@Suppress("FunctionName")
+fun <A, B, S, T> Cartesian(view: (S)->A, update: (S)->(B)->T): CartesianLight<A, B, S, T> = Cartesian(ILens(view, update.unCurry()))
+
+/**
+ * Transform a concrete adapter to [CartesianLight]
+ */
+@MathCatDsl
+@Suppress("FunctionName")
+fun <A, B, S, T> Cartesian(view: (S)->A, update: (B)->T): CartesianLight<A, B, S, T> = Cartesian(view){_: S -> update}
 
 
 

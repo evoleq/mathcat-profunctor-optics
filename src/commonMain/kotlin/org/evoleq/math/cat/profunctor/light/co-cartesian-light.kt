@@ -39,12 +39,12 @@ fun <A, B, S, T> CoCartesian(match: (S)->Either<A, T>, build: (B)->T): CoCartesi
     
     @MathCatDsl
     override fun <U> left(): CoCartesianLight<A, B, Either<S, U>, Either<T, U>> = CoCartesian(
-        assocTail<A, T, U>() o (match + id()), Sum.iota1<T, U>() o build
+        Sum.assocTail<A, T, U>() o (match + id()), Sum.iota1<T, U>() o build
     )
     
     @MathCatDsl
     override fun <U> right(): CoCartesianLight<A, B, Either<U, S>, Either<U, T>> = CoCartesian(
-        Sum<A, Sum<T, U>, Sum<U, T>>(swap()) o assocTail<A, T, U>() o (match + id<U>()) o swap<U, S>(),
+        Sum<A, Sum<T, U>, Sum<U, T>>(Sum.swap()) o Sum.assocTail<A, T, U>() o (match + id<U>()) o Sum.swap<U, S>(),
         Sum.iota2<U, T>() o build
     )
 }

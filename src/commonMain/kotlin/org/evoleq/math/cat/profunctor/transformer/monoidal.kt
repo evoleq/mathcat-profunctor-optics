@@ -20,7 +20,7 @@ import org.evoleq.math.cat.profunctor.Profunctor
 
 interface Monoidal<A, B> : Profunctor<A, B> {
     @MathCatDsl
-    fun <C, D> parallel(): (Pair<Monoidal<A, B>,Monoidal<C, D>>)->Monoidal<Pair<A, C>, Pair<B, D>>
+    fun <C, D> parallel(monoidal: Monoidal<C, D>): Monoidal<Pair<A, C>, Pair<B, D>>
     
     @MathCatDsl
     fun empty(): Monoidal<Unit,Unit>
