@@ -16,6 +16,7 @@
 package org.evoleq.math.cat.profunctor
 
 import org.evoleq.math.cat.adt.Either
+import org.evoleq.math.cat.adt.Nothing
 import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.morphism.Morphism
 import org.evoleq.math.cat.morphism.id

@@ -5,7 +5,7 @@ import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.suspend.profunctor.Profunctor
 import org.evoleq.math.cat.suspend.profunctor.optic.Optic
 
-data class Adapter<A, B, S, T>(private val adapter: suspend CoroutineScope.(Profunctor<A, B>)->Profunctor<S, T>) : Optic<A, B, S, T> by Optic(adapter)
+data class Adapter<A, B, S, T>(private val adapter: suspend CoroutineScope.(Profunctor<A, B>)-> Profunctor<S, T>) : Optic<A, B, S, T> by Optic(adapter)
 
 @MathCatDsl
 @Suppress("FunctionName")

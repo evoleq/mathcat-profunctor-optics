@@ -17,11 +17,13 @@ package org.evoleq.math.cat.suspend.profunctor
 
 import kotlinx.coroutines.CoroutineScope
 import org.evoleq.math.cat.adt.Either
-import org.evoleq.math.cat.adt.Left
-import org.evoleq.math.cat.adt.Right
 import org.evoleq.math.cat.marker.MathCatDsl
+import org.evoleq.math.cat.structure.x
 import org.evoleq.math.cat.suspend.morphism.ScopedSuspended
+import org.evoleq.math.cat.suspend.morphism.id
+import org.evoleq.math.cat.suspend.morphism.o
 import org.evoleq.math.cat.suspend.profunctor.transformer.Algebraic
+import org.evoleq.math.cat.suspend.structure.plus
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -33,48 +35,32 @@ interface  ScopedSuspendedArrow<S, T> : Algebraic<S, T>, ReadOnlyProperty<Any?,s
     
     override fun getValue(thisRef: Any?, property: KProperty<*>): suspend CoroutineScope.(S) -> T = morphism
     
-    override suspend fun <R, U> diMap(pre: suspend CoroutineScope.(R) -> S, post: suspend CoroutineScope.(T) -> U): Arrow<R, U> = Arrow{
-        r -> post(morphism(pre(r)))
-    }
+    @MathCatDsl
+    override suspend fun <R, U> diMap(pre: suspend CoroutineScope.(R) -> S, post: suspend CoroutineScope.(T) -> U): Arrow<R, U> = Arrow(post o morphism o pre)
     
     @MathCatDsl
-    override suspend infix fun <U> map(f: suspend CoroutineScope.(T) -> U): Algebraic<S, U> = diMap({s->s},f)
+    override suspend infix fun <U> map(f: suspend CoroutineScope.(T) -> U): Algebraic<S, U> = diMap(id(),f)
     
     @MathCatDsl
-    override suspend infix fun <R> contraMap(f: suspend CoroutineScope.(R) -> S): Algebraic<R, T> = diMap(f,{t->t})
+    override suspend infix fun <R> contraMap(f: suspend CoroutineScope.(R) -> S): Algebraic<R, T> = diMap(f,id())
     
     @MathCatDsl
-    override suspend fun <C> first(): Arrow<Pair<S, C>, Pair<T, C>> = Arrow{
-        pair -> Pair(morphism(pair.first),pair.second)
-    }
+    override suspend fun <C> first(): Arrow<Pair<S, C>, Pair<T, C>> = Arrow(morphism x id())
     
     @MathCatDsl
-    override suspend fun <C> second(): Arrow<Pair<C, S>, Pair<C, T>> = Arrow {
-        pair -> Pair(pair.first, morphism(pair.second))
-    }
+    override suspend fun <C> second(): Arrow<Pair<C, S>, Pair<C, T>> = Arrow (id<C>() x morphism )
     
     @MathCatDsl
-    override suspend fun <C> left(): Arrow<Either<S, C>, Either<T, C>> = Arrow{
-        e -> when(e) {
-            is Left -> Left(morphism(e.value))
-            is Right -> Right(e.value)
-        }
-    }
+    override suspend fun <C> left(): Arrow<Either<S, C>, Either<T, C>> = Arrow(morphism + id())
     
     @MathCatDsl
-    override suspend fun <C> right(): Arrow<Either<C, S>, Either<C, T>> = Arrow{
-        e -> when(e) {
-            is Left -> Left(e.value)
-            is Right -> Right(morphism(e.value))
-        }
-    }
+    override suspend fun <C> right(): Arrow<Either<C, S>, Either<C, T>> = Arrow(id<C>() + morphism)
 }
 
 @MathCatDsl
 @Suppress("FunctionName")
 fun <S, T> Arrow(morphism: suspend CoroutineScope.(S)->T): Arrow<S, T> = object : Arrow<S, T> {
     override val morphism: suspend CoroutineScope.(S) -> T = morphism
-    
 }
 
 @MathCatDsl

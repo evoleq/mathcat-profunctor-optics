@@ -47,10 +47,13 @@ fun <A, B, S, T> Cartesian(view: (S)->A, update: (S)->(B)->T): CartesianLight<A,
 /**
  * Transform a concrete adapter to [CartesianLight]
  */
+/*
 @MathCatDsl
 @Suppress("FunctionName")
 fun <A, B, S, T> Cartesian(view: (S)->A, update: (B)->T): CartesianLight<A, B, S, T> = Cartesian(view){_: S -> update}
 
+
+ */
 
 
 
