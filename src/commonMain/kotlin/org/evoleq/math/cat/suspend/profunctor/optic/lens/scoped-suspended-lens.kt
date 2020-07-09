@@ -26,6 +26,7 @@ import org.evoleq.math.cat.suspend.optic.lens.ILens
 import org.evoleq.math.cat.suspend.optic.lens.getter
 import org.evoleq.math.cat.suspend.optic.lens.setter
 import org.evoleq.math.cat.suspend.profunctor.Profunctor
+import org.evoleq.math.cat.suspend.profunctor.light.AlgebraicLight
 import org.evoleq.math.cat.suspend.profunctor.light.Cartesian
 import org.evoleq.math.cat.suspend.profunctor.light.CartesianLight
 import org.evoleq.math.cat.suspend.profunctor.optic.Optic
@@ -40,6 +41,10 @@ data class Lens<A, B, S,  T>(
 @MathCatDsl
 suspend fun <A, B, S, T, U, V> Lens<S, T, U, V>.propagate(light: CartesianLight<A, B, S, T>): CartesianLight<A, B, U, V> =
     coroutineScope { this.morphism(light) as CartesianLight<A, B, U, V> }
+
+@MathCatDsl
+suspend fun <A, B, S, T, U, V> Lens<S, T, U, V>.propagate(light: AlgebraicLight<A, B, S, T>): AlgebraicLight<A, B, U, V> =
+    coroutineScope { this.morphism(light) as AlgebraicLight<A, B, U, V> }
 
 @MathCatDsl
 @Suppress("FunctionName")

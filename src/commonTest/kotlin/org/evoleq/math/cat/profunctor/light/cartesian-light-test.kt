@@ -3,6 +3,7 @@ package org.evoleq.math.cat.profunctor.light
 import org.evoleq.math.cat.morphism.by
 import org.evoleq.math.cat.optic.lens.getter
 import org.evoleq.math.cat.profunctor.optic.lens.Lens
+import org.evoleq.math.cat.profunctor.optic.lens.propagate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

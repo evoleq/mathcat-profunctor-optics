@@ -4,7 +4,6 @@ import org.evoleq.math.cat.morphism.by
 import org.evoleq.math.cat.optic.lens.getter
 import org.evoleq.math.cat.optic.lens.setter
 import org.evoleq.math.cat.profunctor.light.CartesianLight
-import org.evoleq.math.cat.profunctor.light.propagate
 import org.evoleq.math.cat.profunctor.optic.o
 import org.evoleq.math.cat.structure.x
 import kotlin.test.Test

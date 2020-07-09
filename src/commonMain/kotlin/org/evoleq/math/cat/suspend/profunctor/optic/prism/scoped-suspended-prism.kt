@@ -22,8 +22,10 @@ import org.evoleq.math.cat.adt.Either
 import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.suspend.morphism.id
 import org.evoleq.math.cat.suspend.profunctor.Profunctor
+import org.evoleq.math.cat.suspend.profunctor.light.AlgebraicLight
 import org.evoleq.math.cat.suspend.profunctor.light.CoCartesianLight
 import org.evoleq.math.cat.suspend.profunctor.optic.Optic
+import org.evoleq.math.cat.suspend.profunctor.optic.alias.ConcretePrism
 import org.evoleq.math.cat.suspend.profunctor.transformer.CoCartesian
 import org.evoleq.math.cat.suspend.structure.measure
 
@@ -36,6 +38,10 @@ data class Prism<A, B, S,  T>(
 suspend fun <A, B, S, T, U, V> Prism<S, T, U, V>.propagate(light: CoCartesianLight<A, B, S, T>): CoCartesianLight<A, B, U, V> =
     coroutineScope { this.morphism(light) as CoCartesianLight<A, B, U, V> }
 
+@MathCatDsl
+suspend fun <A, B, S, T, U, V> Prism<S, T, U, V>.propagate(light: AlgebraicLight<A, B, S, T>): AlgebraicLight<A, B, U, V> =
+    coroutineScope { this.morphism(light) as AlgebraicLight<A, B, U, V> }
+
 
 @MathCatDsl
 @Suppress("FunctionName")
@@ -45,3 +51,9 @@ fun <A, B, S, T> Prism(
 ): Prism<A, B, S, T> = Prism{
     coCartesian -> coCartesian.left<T>().diMap(match, measure(build, id()))
 }
+
+@MathCatDsl
+@Suppress("FunctionName")
+suspend fun <A, B, S, T> ConcretePrism(prism: Prism<A, B, S, T>): ConcretePrism<S, T, A, B> = prism.propagate(
+    CoCartesianLight.unRefracted<A, B>()
+)

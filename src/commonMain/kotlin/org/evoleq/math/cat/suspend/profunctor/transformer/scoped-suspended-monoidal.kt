@@ -24,7 +24,7 @@ typealias Monoidal<S, T> = ScopedSuspendedMonoidal<S, T>
 
 interface ScopedSuspendedMonoidal<S, T> : Profunctor<S, T> {
     @MathCatDsl
-    suspend fun <C, D> parallel(): suspend CoroutineScope.(Pair<Profunctor<S, T>, Profunctor<C, D>>)-> Profunctor<Pair<S, C>, Pair<T, D>>
+    suspend fun <C, D> parallel(monoidal: Monoidal<C, D>): Monoidal<Pair<S, C>, Pair<T, D>>
     @MathCatDsl
     fun empty(): Monoidal<Unit, Unit>
     @MathCatDsl
