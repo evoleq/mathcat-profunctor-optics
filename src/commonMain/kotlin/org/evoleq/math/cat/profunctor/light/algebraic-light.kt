@@ -7,9 +7,10 @@ import org.evoleq.math.cat.morphism.id
 import org.evoleq.math.cat.morphism.o
 import org.evoleq.math.cat.profunctor.optic.alias.ConcreteAdapter
 import org.evoleq.math.cat.profunctor.transformer.Algebraic
+import org.evoleq.math.cat.structure.plus
 import org.evoleq.math.cat.structure.x
 
-interface AlgebraicLight<A, B, S, T> : Algebraic<S, T>, CoCartesianLight<Either<A,T>, Pair<S, B>, S, T>, CartesianLight<Either<A,T>, Pair<S, B>, S, T>, MonoidalLight<A, B, S, T>/*,CoMonoidalLight<A, B, S, T>*/ {
+interface AlgebraicLight<A, B, S, T> : Algebraic<S, T>, CoCartesianLight<Either<A,T>, Pair<S, B>, S, T>, CartesianLight<Either<A,T>, Pair<S, B>, S, T>, MonoidalLight<A, B, S, T>, CoMonoidalLight<A, B, S, T> {
 
     companion object {
         @MathCatDsl
@@ -36,13 +37,13 @@ interface AlgebraicLight<A, B, S, T> : Algebraic<S, T>, CoCartesianLight<Either<
     
     @MathCatDsl
     override fun empty(): AlgebraicLight<A, B, Unit, Unit>
-    /*
+    
     @MathCatDsl
     override fun <U, V> branch(coMonoidalLight: CoMonoidalLight<A, B, U, V>): AlgebraicLight<A, B, Either<S, U>, Either<T, V>>
     
     @MathCatDsl
     override fun nothing(): CoMonoidalLight<A, B, Nothing, Nothing>
-     */
+    
     @MathCatDsl
     override fun <R, U> diMap(pre: (R) -> S, post: (T) -> U): AlgebraicLight<A, B,R, U>
     
@@ -137,7 +138,7 @@ fun <A, B, S, T> Algebraic(match: (S)->Either<A, T>, update: (Pair<S,B>)->T): Al
         {Right(Unit)},
         {Unit}
     )
-    /*
+    
     @MathCatDsl
     override fun <U, V> branch(coMonoidal: CoMonoidalLight<A, B, U, V>): AlgebraicLight<A, B, Either<S, U>, Either<T, V>> {
         require(coMonoidal is AlgebraicLight<*,*,*,*>)
@@ -152,7 +153,6 @@ fun <A, B, S, T> Algebraic(match: (S)->Either<A, T>, update: (Pair<S,B>)->T): Al
     @MathCatDsl
     override fun nothing(): CoMonoidalLight<A, B, Nothing,Nothing> = Algebraic({Right(Nothing)},{ pair -> pair.first})
     
-     */
 }
 @MathCatDsl
 @Suppress("FunctionName")

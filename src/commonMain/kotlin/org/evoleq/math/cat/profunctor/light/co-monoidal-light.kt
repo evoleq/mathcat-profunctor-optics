@@ -4,7 +4,7 @@ import org.evoleq.math.cat.adt.Either
 import org.evoleq.math.cat.adt.Nothing
 import org.evoleq.math.cat.profunctor.transformer.CoMonoidal
 
-interface CoMonoidalLight<A, B, S, T> : CoMonoidal<S, T> {
+interface CoMonoidalLight<A, B, in S, out T> : CoMonoidal<S, T> {
     
     fun <U, V> branch(coMonoidalLight: CoMonoidalLight<A, B, U, V>): CoMonoidalLight<A,B,Either<S, U>, Either<T, V>>
     
