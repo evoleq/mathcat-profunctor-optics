@@ -18,6 +18,7 @@ package org.evoleq.math.cat.suspend.profunctor.light
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import org.evoleq.math.cat.adt.*
+import org.evoleq.math.cat.adt.Nothing
 import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.profunctor.optic.alias.ConcreteAdapter
 import org.evoleq.math.cat.structure.x

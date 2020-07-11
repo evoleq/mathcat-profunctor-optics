@@ -16,6 +16,7 @@
 package org.evoleq.math.cat.profunctor.light
 
 import org.evoleq.math.cat.adt.*
+import org.evoleq.math.cat.adt.Nothing
 import org.evoleq.math.cat.comonad.store.IStore
 import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.morphism.id
