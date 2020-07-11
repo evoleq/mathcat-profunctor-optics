@@ -23,7 +23,7 @@ class OpticCompositionTest {
         val mixedData: DataMixed
     )
     @Test
-    fun `compose lens with prism` () {
+    fun `compose lens after prism` () {
         val bigLens = Lens<DataMixed,DataMixed, BigData,BigData>{
             prof -> prof.first<BigData>() contraMap
                 {bigData:BigData -> bigData.mixedData x bigData } map
@@ -63,6 +63,53 @@ class OpticCompositionTest {
         val match = Sum.multiply<String, BigData>()  O propagated.match
         val build = propagated.build
         val morphism = by(propagated)
+    }
+    @Test
+    fun `compose prism after lens`() {
+        data class IntData(val x : Int)
+        data class StringData(val s: String)
+        data class WrapperData(val intData: IntData, val StringData: StringData)
+        data class MixedData(val mixed: Either<StringData,WrapperData>)
+        
+        val lens: Lens<IntData,IntData,WrapperData,WrapperData> = Lens{
+            prof -> prof.first<WrapperData>() contraMap
+                {wrapperData: WrapperData -> wrapperData.intData x wrapperData} map
+                {pair: Pair<IntData,WrapperData> -> pair.second.copy(intData = pair.first)}
+        }
+        
+        val prism: Prism<WrapperData,WrapperData, MixedData, MixedData> = Prism {
+            prof -> prof.left<MixedData>() contraMap
+                {mixedData: MixedData -> when(val mixed = mixedData.mixed){
+                    is Left -> Right<WrapperData,MixedData>(MixedData(Left(mixed.value)))
+                    is Right ->Left(mixed.value)
+                } } map
+                {sum: Either<WrapperData, MixedData> -> when(sum){
+                    is Left -> MixedData(Right(sum.value))
+                    is Right -> sum.value
+                } }
+        }
+        
+        val composed = prism o lens
+        
+        val propagated = composed.propagate(AlgebraicLight.unRefracted())
+        
+        val match = Sum.multiply<IntData, MixedData>() O propagated.match
+        val build = propagated.build
+        val morphism = by(propagated)
+        
+        val matched1 = match(MixedData(Right(WrapperData(IntData(0),StringData("")))))
+        require(matched1 is Left)
+        
+        val matched2 = match(MixedData(Left(StringData(""))))
+        require(matched2 is Right)
+        
+        val built1 = build(MixedData(Left(StringData(""))) x IntData(5))
+        require(built1.mixed is Left)
+        
+        val built2 = build(MixedData(Right(WrapperData(IntData(0),StringData("test")))) x IntData(5))
+        require(built2.mixed is Right)
+        assertEquals(5, built2.mixed.value.intData.x)
+        assertEquals("test",built2.mixed.value.StringData.s)
     }
     
 }
