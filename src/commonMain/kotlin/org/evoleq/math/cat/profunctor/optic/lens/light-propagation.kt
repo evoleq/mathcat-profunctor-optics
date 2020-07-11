@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.evoleq.math.cat.suspend.profunctor.optic.adapter
+package org.evoleq.math.cat.profunctor.optic.lens
 
-import kotlinx.coroutines.CoroutineScope
 import org.evoleq.math.cat.marker.MathCatDsl
-import org.evoleq.math.cat.suspend.profunctor.Profunctor
-import org.evoleq.math.cat.suspend.profunctor.optic.Optic
+import org.evoleq.math.cat.profunctor.light.AlgebraicLight
+import org.evoleq.math.cat.profunctor.light.CartesianLight
 
-data class Adapter<A, B, S, T>(private val adapter: suspend CoroutineScope.(Profunctor<A, B>)-> Profunctor<S, T>) : Optic<A, B, S, T> by Optic(adapter)
 
+/**
+ * Propagate [CartesianLight] through [Lens]
+ */
 @MathCatDsl
-@Suppress("FunctionName")
-fun <A, B, S, T> Adapter(from: suspend CoroutineScope.(S)->A, to: suspend CoroutineScope.(B)->T): Adapter<A, B, S, T> = Adapter{
-    profunctor -> profunctor.diMap(from, to)
-}
+fun <A, B, S, T, U, V> Lens<S, T, U, V>.propagate(
+    light: CartesianLight<A, B, S, T>
+): CartesianLight<A, B, U, V> = this.morphism(light) as CartesianLight<A, B, U, V>
+
+
+/**
+ * Propagate [AlgebraicLight] through [Lens]
+ */
+@MathCatDsl
+fun <A, B, S, T, U, V> Lens<S, T, U, V>.propagate(
+    light: AlgebraicLight<A, B, S, T>
+): AlgebraicLight<A, B, U, V> = this.morphism(light as CartesianLight<A, B, S, T>) as AlgebraicLight<A, B, U, V>

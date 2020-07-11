@@ -25,7 +25,6 @@ import org.evoleq.math.cat.optic.lens.ILens
 import org.evoleq.math.cat.optic.lens.getter
 import org.evoleq.math.cat.optic.lens.setter
 import org.evoleq.math.cat.profunctor.Profunctor
-import org.evoleq.math.cat.profunctor.light.AlgebraicLight
 import org.evoleq.math.cat.profunctor.light.CartesianLight
 import org.evoleq.math.cat.profunctor.optic.Optic
 import org.evoleq.math.cat.profunctor.optic.alias.ConcreteLens
@@ -45,22 +44,18 @@ fun <A, B, S, T> Lens(lens: ConcreteLens<S, T, A, B>): Lens<A, B, S, T> = Lens{ 
     )
 }
 
-@MathCatDsl
-fun <A, B, S, T, U, V> Optic<S, T, U, V>.propagate(
-    light: CartesianLight<A, B, S, T>
-): CartesianLight<A, B, U, V> = this.morphism(light) as CartesianLight<A, B, U, V>
-
-@MathCatDsl
-fun <A, B, S, T, U, V> Lens<S, T, U, V>.propagate(
-    light: AlgebraicLight<A, B, S, T>
-): AlgebraicLight<A, B, U, V> = this.morphism(light as CartesianLight<A, B, S, T>) as AlgebraicLight<A, B, U, V>
-
+/**
+ * Construct profunctor [Lens] from view and update function
+ */
 @MathCatDsl
 @Suppress("FunctionName")
 fun <A, B, S, T> Lens(view: (S)->A, update: (S)->(B)->T): Lens< A, B, S, T> = Lens(ILens {
     s: S -> with((fork(view, update)(s))) { IStore(first, second) }
 })
 
+/**
+ * Construct [ConcreteLens] from profunctor [Lens]
+ */
 @MathCatDsl
 @Suppress("FunctionName")
 fun <A, B, S, T>  ConcreteLens(lens: Lens<A, B, S, T>): ConcreteLens<S, T, A, B> = lens.propagate(CartesianLight.unRefracted())

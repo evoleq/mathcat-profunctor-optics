@@ -26,9 +26,7 @@ import org.evoleq.math.cat.suspend.optic.lens.ILens
 import org.evoleq.math.cat.suspend.optic.lens.getter
 import org.evoleq.math.cat.suspend.optic.lens.setter
 import org.evoleq.math.cat.suspend.profunctor.Profunctor
-import org.evoleq.math.cat.suspend.profunctor.light.AlgebraicLight
 import org.evoleq.math.cat.suspend.profunctor.light.Cartesian
-import org.evoleq.math.cat.suspend.profunctor.light.CartesianLight
 import org.evoleq.math.cat.suspend.profunctor.optic.Optic
 import org.evoleq.math.cat.suspend.profunctor.optic.alias.ConcreteLens
 import org.evoleq.math.cat.suspend.profunctor.transformer.Cartesian
@@ -38,14 +36,9 @@ data class Lens<A, B, S,  T>(
     private val lens: suspend CoroutineScope.(Cartesian<A, B>)-> Cartesian<S, T>
 ) : Optic<A, B, S, T> by Optic(lens as suspend CoroutineScope.(Profunctor<A, B>)-> Cartesian<S, T>)
 
-@MathCatDsl
-suspend fun <A, B, S, T, U, V> Lens<S, T, U, V>.propagate(light: CartesianLight<A, B, S, T>): CartesianLight<A, B, U, V> =
-    coroutineScope { this.morphism(light) as CartesianLight<A, B, U, V> }
-
-@MathCatDsl
-suspend fun <A, B, S, T, U, V> Lens<S, T, U, V>.propagate(light: AlgebraicLight<A, B, S, T>): AlgebraicLight<A, B, U, V> =
-    coroutineScope { this.morphism(light) as AlgebraicLight<A, B, U, V> }
-
+/**
+ * Construct profunctor [Lens] from [ConcreteLens]
+ */
 @MathCatDsl
 @Suppress("FunctionName")
 fun <A, B, S, T> Lens(lens: ConcreteLens<S, T, A, B>): Lens<A, B, S, T> = Lens{ cartesian ->
@@ -55,6 +48,9 @@ fun <A, B, S, T> Lens(lens: ConcreteLens<S, T, A, B>): Lens<A, B, S, T> = Lens{ 
     )
 }
 
+/**
+ * Construct [ConcreteLens] from profunctor [Lens]
+ */
 @MathCatDsl
 @Suppress("FunctionName")
 suspend fun <A, B, S, T>  ConcreteLens(lens: Lens<A, B, S, T>): ConcreteLens<S, T, A, B> = coroutineScope {

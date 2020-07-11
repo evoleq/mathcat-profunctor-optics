@@ -5,6 +5,7 @@ import org.evoleq.math.cat.optic.lens.getter
 import org.evoleq.math.cat.optic.lens.setter
 import org.evoleq.math.cat.profunctor.light.CartesianLight
 import org.evoleq.math.cat.profunctor.optic.o
+import org.evoleq.math.cat.profunctor.optic.propagate
 import org.evoleq.math.cat.structure.x
 import kotlin.test.Test
 import kotlin.test.assertEquals

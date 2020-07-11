@@ -1,6 +1,22 @@
+/**
+ * Copyright (c) 2020 Dr. Florian Schmidt
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.evoleq.math.cat.suspend.profunctor.light
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import org.evoleq.math.cat.adt.*
 import org.evoleq.math.cat.marker.MathCatDsl
 import org.evoleq.math.cat.profunctor.optic.alias.ConcreteAdapter
@@ -10,8 +26,9 @@ import org.evoleq.math.cat.suspend.morphism.id
 import org.evoleq.math.cat.suspend.morphism.o
 import org.evoleq.math.cat.suspend.morphism.suspendOnScope
 import org.evoleq.math.cat.suspend.profunctor.transformer.Algebraic
+import org.evoleq.math.cat.suspend.structure.plus
 
-interface AlgebraicLight<A, B, S, T> : Algebraic<S, T>, CoCartesianLight<Either<A, T>, Pair<S, B>, S, T>, CartesianLight<Either<A, T>, Pair<S, B>, S, T>, MonoidalLight<A, B, S, T>/*,CoMonoidalLight<A, B, S, T>*/ {
+interface AlgebraicLight<A, B, S, T> : Algebraic<S, T>, CoCartesianLight<Either<A, T>, Pair<S, B>, S, T>, CartesianLight<Either<A, T>, Pair<S, B>, S, T>, MonoidalLight<A, B, S, T>, CoMonoidalLight<A, B, S, T> {
     
     companion object {
         @MathCatDsl
@@ -44,13 +61,13 @@ interface AlgebraicLight<A, B, S, T> : Algebraic<S, T>, CoCartesianLight<Either<
     
     @MathCatDsl
     override fun empty(): AlgebraicLight<A, B, Unit, Unit>
-    /*
-    @MathCatDsl
-    override fun <U, V> branch(coMonoidalLight: CoMonoidalLight<A, B, U, V>): AlgebraicLight<A, B, Either<S, U>, Either<T, V>>
     
     @MathCatDsl
-    override fun nothing(): CoMonoidalLight<A, B, Nothing, Nothing>
-     */
+    override suspend fun <U, V> branch(coMonoidalLight: CoMonoidalLight<A, B, U, V>): AlgebraicLight<A, B, Either<S, U>, Either<T, V>>
+    
+    @MathCatDsl
+    override fun nothing(): AlgebraicLight<A, B, Nothing, Nothing>
+    
     @MathCatDsl
     override suspend fun <R, U> diMap(pre: suspend CoroutineScope.(R) -> S, post: suspend CoroutineScope.(T) -> U): AlgebraicLight<A, B, R, U>
     
@@ -147,6 +164,20 @@ fun <A, B, S, T> Algebraic(match: suspend CoroutineScope.(S)->Either<A, T>, upda
         {Right(Unit)},
         {Unit}
     )
+    
+    override suspend  fun <U, V> branch(coMonoidalLight: CoMonoidalLight<A, B, U, V>): AlgebraicLight<A, B, Either<S, U>, Either<T, V>> = coroutineScope scope@{
+        require(coMonoidalLight is AlgebraicLight<*, *, *, *>)
+        Algebraic(
+            Sum.merge<A, T, V>().suspendOnScope() o ((Sum.multiply<A, T>().suspendOnScope() o (match as suspend CoroutineScope.(S) -> Either<Either<A, T>, T>)) + (Sum.multiply<A, V>().suspendOnScope() o (coMonoidalLight as AlgebraicLight<A, B, U, V>).match)),
+            { pair: Pair<Either<S, U>, B> ->
+                when (val either = pair.first) {
+                    is Left -> Left(build(either.value x pair.second))
+                    is Right -> Right((coMonoidalLight as AlgebraicLight<A, B, U, V>).build(this@scope, either.value x pair.second))
+                }
+            }
+        )
+    }
+    override fun nothing(): AlgebraicLight<A, B, Nothing, Nothing> = Algebraic({ Right(Nothing) }, { pair -> pair.first })
 }
 
 @MathCatDsl
