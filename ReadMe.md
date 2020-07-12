@@ -1,4 +1,4 @@
-# Mathcat Template
+# Mathcat Profunctor Optics
 
 |Platform|||
 |---|---|---|
